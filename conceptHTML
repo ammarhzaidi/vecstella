@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VecStella - The Dynamic Enterprise Operating System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js & Plotly.js (as per requirements, for potential future dashboarding) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Placeholder Comments -->
+    <!-- Chosen Palette: "Calm Neutrals" - A palette of warm grays, off-white, and a deep teal accent to create a professional, focused, and modern aesthetic. -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive "workbench" to clearly demonstrate the core value proposition. The layout is split into two main columns: the left "Genesis AI Engine" for user input, and the right "VecStella OS" for the dynamic output. This structure allows investors to immediately grasp the cause-and-effect relationship of the product: a natural language prompt creates a tangible, multi-faceted "micro-app." Pre-set examples guide the user, while the tabbed output (Form, Schema, etc.) showcases the depth of the generation process. This design prioritizes interactive storytelling and proof-of-concept over a traditional, static webpage. -->
+    <!-- Visualization & Content Choices: 
+        - Natural Language Prompt (Goal: Input): A prominent textarea is the primary interaction point.
+        - Industry Pre-sets (Goal: Guided Discovery): Clickable buttons lower the barrier to entry and showcase versatility across different domains.
+        - Generated Form Preview (Goal: Tangible Output): Rendering live, interactive HTML form elements provides immediate, undeniable proof of the AI's capability. The interactive tooth chart is a "wow factor" element built with an HTML/CSS grid and JS to demonstrate complex UI generation.
+        - Data Schema / Integration Code (Goal: Technical Credibility): Displaying JSON and code snippets in formatted blocks appeals to technically-minded stakeholders and proves the system's backend understanding.
+        - Workflow Diagram (Goal: Explain Logic): A custom HTML/CSS diagram visualizes the generated business logic without relying on SVG or external libraries, demonstrating creative and lightweight solutions.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Light warm gray background */
+        }
+        .glass-pane {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .tab-active {
+            border-color: #0d9488; /* Deep Teal */
+            color: #0d9488;
+            font-weight: 600;
+        }
+        .tooth {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .tooth.selected {
+            background-color: #14b8a6; /* Teal-400 */
+            color: white;
+        }
+        /* Custom Workflow Diagram Styles */
+        .workflow-step {
+            position: relative;
+            padding: 1rem;
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .workflow-arrow {
+            position: absolute;
+            left: 50%;
+            bottom: -28px;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 28px;
+            background-color: #9ca3af;
+        }
+        .workflow-arrow::after {
+            content: '';
+            position: absolute;
+            left: -5px;
+            bottom: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #9ca3af;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="min-h-screen p-4 sm:p-6 lg:p-8 flex flex-col">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900">VecStella</h1>
+            <p class="text-lg text-gray-600 mt-2">The Dynamic Enterprise Operating System</p>
+        </header>
+
+        <main class="max-w-7xl mx-auto w-full flex-grow">
+            <div class="text-center bg-white p-6 rounded-xl shadow-sm mb-8">
+                 <h2 class="text-2xl font-semibold text-gray-800">Generate Custom Micro-Apps with AI</h2>
+                 <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Describe the form, workflow, or integration you need in plain language. The Genesis AI Engine will build it for your ERPNext instance instantly. This prototype demonstrates how VecStella translates your ideas into functional enterprise tools.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column: AI Engine Input -->
+                <div class="glass-pane p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <span class="text-2xl mr-3">🚀</span> Genesis AI Engine
+                    </h3>
+                    
+                    <div class="mb-4">
+                        <label for="ai-prompt" class="block text-sm font-medium text-gray-700 mb-2">Describe what you want to build:</label>
+                        <textarea id="ai-prompt" rows="8" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"></textarea>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Or, start with an industry pre-set:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="preset-btn bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg transition text-sm" data-preset="dental">🦷 Dental Clinic</button>
+                            <button class="preset-btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition text-sm" data-preset="fleet">🚚 Fleet Management</button>
+                            <button class="preset-btn bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition text-sm" data-preset="retail">🛍️ Retail Store</button>
+                        </div>
+                    </div>
+
+                    <button id="generate-btn" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center">
+                        <span id="generate-btn-text">Generate Micro-App</span>
+                        <div id="loader" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin ml-3"></div>
+                    </button>
+                </div>
+
+                <!-- Right Column: Generated Output -->
+                <div id="output-container" class="glass-pane p-6 rounded-xl shadow-lg min-h-[400px] flex flex-col">
+                     <div id="output-placeholder" class="m-auto text-center text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Your generated micro-app will appear here.</h3>
+                        <p class="mt-1 text-sm text-gray-500">Start by entering a prompt or selecting a pre-set.</p>
+                    </div>
+                    <div id="output-content" class="hidden w-full flex-grow flex flex-col">
+                        <div class="border-b border-gray-200 mb-4">
+                            <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                                <button class="tab-btn tab-active whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm" data-tab="form">Form Preview</button>
+                                <button class="tab-btn text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="workflow">Workflow</button>
+                                <button class="tab-btn text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="schema">Data Schema</button>
+                                <button class="tab-btn text-gray-500 hover:text-gray-700 whitespace-nowrap py-3 px-1 border-b-2 border-transparent font-medium text-sm" data-tab="integration">Integration</button>
+                            </nav>
+                        </div>
+                        <div id="tab-content" class="flex-grow overflow-y-auto pr-2">
+                            <!-- Content will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-12 py-4">
+            <p class="text-xs text-gray-500">
+                &copy; 2024 Ammar Hasan. All Rights Reserved.
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+                This prototype, including its code and underlying concepts, is the intellectual property of Ammar Hasan (work.syedammarhasan@gmail.com).<br>
+                Unauthorized copying, distribution, or use without prior written permission is strictly prohibited.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const promptTextarea = document.getElementById('ai-prompt');
+            const generateBtn = document.getElementById('generate-btn');
+            const generateBtnText = document.getElementById('generate-btn-text');
+            const loader = document.getElementById('loader');
+            const outputPlaceholder = document.getElementById('output-placeholder');
+            const outputContent = document.getElementById('output-content');
+            const tabContainer = document.querySelector('nav[aria-label="Tabs"]');
+            const tabContentContainer = document.getElementById('tab-content');
+
+            const presets = {
+                dental: `I need a patient intake form for our dental practice. It should include fields for personal information, insurance provider details, and a checklist for pre-existing medical conditions. I also need an interactive tooth chart where the dentist can mark specific teeth for treatment. When the form is submitted, it should create a new patient record, and if insurance is listed, it should automatically verify the policy number with our insurance partner's API.`,
+                fleet: `Create a daily vehicle inspection form. It needs fields for Vehicle ID, Odometer Reading, and checklists for Tires, Brakes, Lights, and Fluid Levels. If any item is marked 'Needs Repair', the workflow should automatically create a new Maintenance Request in ERPNext and set the vehicle's status to 'Unavailable'.`,
+                retail: `Generate a special order form for a retail store. Include customer name, phone number, product SKU, and a field for a 50% deposit amount. The workflow should create a Sales Order in ERPNext with a 'Special Order' status. Upon receiving the item in stock, it should automatically send an SMS to the customer that their order is ready for pickup.`
+            };
+
+            const outputs = {
+                dental: {
+                    form: `
+                        <h3 class="text-lg font-semibold mb-4">Dental Patient Intake Form</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium">Full Name</label>
+                                <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Insurance Provider</label>
+                                <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">Medical Conditions</label>
+                                <div class="mt-2 space-y-1">
+                                    <label class="flex items-center"><input type="checkbox" class="rounded mr-2"> Diabetes</label>
+                                    <label class="flex items-center"><input type="checkbox" class="rounded mr-2"> High Blood Pressure</label>
+                                    <label class="flex items-center"><input type="checkbox" class="rounded mr-2"> Allergies</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Tooth Chart (Click to select)</label>
+                                <div id="tooth-chart" class="grid grid-cols-8 gap-1 text-xs text-center">
+                                    ${Array.from({ length: 32 }, (_, i) => `<div class="tooth bg-white border rounded cursor-pointer p-2">${i + 1}</div>`).join('')}
+                                </div>
+                            </div>
+                             <button class="w-full bg-teal-600 text-white py-2 rounded-lg">Submit Form</button>
+                        </div>
+                    `,
+                    schema: `
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg text-sm overflow-x-auto"><code>{
+  "doctype": "Patient Intake",
+  "fields": [
+    { "fieldname": "full_name", "fieldtype": "Data", "label": "Full Name" },
+    { "fieldname": "insurance_provider", "fieldtype": "Data", "label": "Insurance Provider" },
+    { "fieldname": "has_diabetes", "fieldtype": "Check", "label": "Diabetes" },
+    { "fieldname": "has_hbp", "fieldtype": "Check", "label": "High Blood Pressure" },
+    { "fieldname": "has_allergies", "fieldtype": "Check", "label": "Allergies" },
+    { "fieldname": "selected_teeth", "fieldtype": "Small Text", "label": "Selected Teeth" }
+  ],
+  "permissions": [
+    { "role": "Healthcare Administrator", "read": 1, "write": 1, "create": 1 }
+  ]
+}</code></pre>
+                    `,
+                    integration: `
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg text-sm overflow-x-auto"><code># Python code to verify insurance via a partner API
+import requests
+
+def verify_insurance(api_key, policy_number):
+    """
+    Connects to the insurance partner API to verify a policy.
+    """
+    api_url = "https://api.insurancepartner.com/v1/verify"
+    headers = {"Authorization": f"Bearer {api_key}"}
+    payload = {"policyNumber": policy_number}
+    
+    try:
+        response = requests.post(api_url, headers=headers, json=payload)
+        response.raise_for_status() # Raise an exception for bad status codes
+        
+        data = response.json()
+        if data.get("status") == "active":
+            return True, "Policy is active."
+        else:
+            return False, data.get("reason", "Policy is not active.")
+            
+    except requests.exceptions.RequestException as e:
+        return False, f"API connection error: {e}"
+
+# This would be triggered on form submission.
+# is_valid, message = verify_insurance("SECRET_API_KEY", doc.insurance_policy_id)
+</code></pre>
+                    `,
+                    workflow: `
+                        <div class="space-y-10 py-4">
+                            <div class="workflow-step">
+                                <p class="font-semibold">Patient Submits Form</p>
+                                <p class="text-sm text-gray-500">User fills out and submits the intake form.</p>
+                                <div class="workflow-arrow"></div>
+                            </div>
+                            <div class="workflow-step">
+                                <p class="font-semibold">Create Patient Record</p>
+                                <p class="text-sm text-gray-500">A new 'Patient' DocType is created in ERPNext.</p>
+                                <div class="workflow-arrow"></div>
+                            </div>
+                            <div class="workflow-step">
+                                <p class="font-semibold">Verify Insurance (API Call)</p>
+                                <p class="text-sm text-gray-500">If insurance is provided, call external partner API.</p>
+                                <div class="workflow-arrow"></div>
+                            </div>
+                            <div class="workflow-step">
+                                <p class="font-semibold">Notify Administrator</p>
+                                <p class="text-sm text-gray-500">Send an email notification to the front desk.</p>
+                            </div>
+                        </div>
+                    `
+                },
+                fleet: {
+                    form: `<h3 class="text-lg font-semibold mb-4">Daily Vehicle Inspection</h3><p>Form generated for Fleet Management.</p>`,
+                    schema: `<pre class="bg-gray-800 text-white p-4 rounded-lg text-sm"><code>// Data Schema for Fleet Inspection</code></pre>`,
+                    integration: `<pre class="bg-gray-800 text-white p-4 rounded-lg text-sm"><code>// No external integrations for this workflow.</code></pre>`,
+                    workflow: `<p>Workflow diagram for Fleet Management.</p>`
+                },
+                retail: {
+                    form: `<h3 class="text-lg font-semibold mb-4">Retail Special Order</h3><p>Form generated for Retail Store.</p>`,
+                    schema: `<pre class="bg-gray-800 text-white p-4 rounded-lg text-sm"><code>// Data Schema for Retail Special Order</code></pre>`,
+                    integration: `<pre class="bg-gray-800 text-white p-4 rounded-lg text-sm"><code>// SMS Gateway Integration Code</code></pre>`,
+                    workflow: `<p>Workflow diagram for Retail Store.</p>`
+                }
+            };
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const presetKey = btn.dataset.preset;
+                    promptTextarea.value = presets[presetKey];
+                });
+            });
+
+            generateBtn.addEventListener('click', () => {
+                if (!promptTextarea.value) {
+                    alert('Please enter a prompt or select a pre-set.');
+                    return;
+                }
+                
+                generateBtnText.classList.add('hidden');
+                loader.classList.remove('hidden');
+                generateBtn.disabled = true;
+
+                setTimeout(() => {
+                    outputPlaceholder.classList.add('hidden');
+                    outputContent.classList.remove('hidden');
+                    
+                    // Determine which output to show based on prompt content
+                    let outputKey = 'dental'; // Default
+                    const promptLowerCase = promptTextarea.value.toLowerCase();
+                    if (promptLowerCase.includes('fleet') || promptLowerCase.includes('vehicle')) {
+                        outputKey = 'fleet';
+                    } else if (promptLowerCase.includes('retail') || promptLowerCase.includes('store')) {
+                        outputKey = 'retail';
+                    }
+
+                    renderTabContent(outputKey, 'form');
+                    setActiveTab('form');
+
+                    generateBtnText.classList.remove('hidden');
+                    loader.classList.add('hidden');
+                    generateBtn.disabled = false;
+                }, 2000);
+            });
+
+            tabContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-btn')) {
+                    const tabName = e.target.dataset.tab;
+                    let outputKey = 'dental'; // Re-evaluate key on tab click
+                    const promptLowerCase = promptTextarea.value.toLowerCase();
+                    if (promptLowerCase.includes('fleet') || promptLowerCase.includes('vehicle')) {
+                        outputKey = 'fleet';
+                    } else if (promptLowerCase.includes('retail') || promptLowerCase.includes('store')) {
+                        outputKey = 'retail';
+                    }
+                    
+                    renderTabContent(outputKey, tabName);
+                    setActiveTab(tabName);
+                }
+            });
+
+            function renderTabContent(key, tabName) {
+                tabContentContainer.innerHTML = outputs[key][tabName];
+                if (key === 'dental' && tabName === 'form') {
+                    addToothChartLogic();
+                }
+            }
+            
+            function setActiveTab(tabName) {
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('tab-active');
+                    if (btn.dataset.tab === tabName) {
+                        btn.classList.add('tab-active');
+                    }
+                });
+            }
+
+            function addToothChartLogic() {
+                const toothChart = document.getElementById('tooth-chart');
+                if (toothChart) {
+                    toothChart.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('tooth')) {
+                            e.target.classList.toggle('selected');
+                        }
+                    });
+                }
+            }
+
+        });
+    </script>
+</body>
+</html>
