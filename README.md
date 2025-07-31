@@ -1,1 +1,2 @@
-# vecstella
+# VecStella
+Simple concept for VecStella
